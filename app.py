@@ -29,8 +29,13 @@ class CountryData(Resource):
         print("Country data is "+ name)
         return country_data.val()
 
+class Active(Resource):
+    def post(self):
+        return "active"
 
 api.add_resource(CountryData, "/api/country/<string:name>")
+api.add_resource(Active,"/")
+
 
 if __name__ == "__main__":
     app.run(debug=False)
