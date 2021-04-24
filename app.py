@@ -1,20 +1,43 @@
 import flask
 from flask import request
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
+from flask_restful import Api, Resource
+
+import pyrebase
 import datetime
 from pandas import *
 import json
 import os
 
+firebaseConfig = {
+    "apiKey": "AIzaSyBTzzXFHncci7RanGMjNfduJ8_471RkYoU",
+    "authDomain": "open-street-map-research.firebaseapp.com",
+    "databaseURL": "https://open-street-map-research-default-rtdb.firebaseio.com",
+    "storageBucket": "open-street-map-research.appspot.com",
+    "serviceAccount": "open-street-map-research-firebase-adminsdk-4kv8q-3f47cae2b0.json"
+     }
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+db = firebase.database()
 app = flask.Flask(__name__)
-cred = credentials.Certificate('open-street-map-research-firebase-adminsdk-4kv8q-3f47cae2b0.json')
-firebase_admin.initialize_app(cred, {'databaseURL': 'https://open-street-map-research-default-rtdb.firebaseio.com'})
+api = Api(app)
+class CountryData(Resource):
+    def get(self, name):
+        return {"country": name, "request": "GET"}
+
+    def post(self, name):
+        country_data = db.child('/osm_data/analyzed/'+name+'/top_5/data').get()
+        print("Country data is "+ name)
+        return country_data.val()
 
 
-@app.route('/',methods=['GET'])
+api.add_resource(CountryData, "/api/country/<string:name>")
 
-def home():
-    ref = db.reference('osm-data/analyzed/india/top_5/data')
-    return ref.get()
+if __name__ == "__main__":
+    app.run(debug=False)
+
+
+# @app.route('/api/get_data',methods=['GET','POST'])
+# def get_data():
+#     ref = db.reference('osm-data/analyzed/india/top_5/data')
+#     # return ref.get()
+#     if request.method == 'POST':
