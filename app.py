@@ -51,10 +51,3 @@ api.add_resource(CountryData, "/api/country/<string:name>/<string:category>")
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-# @app.route('/api/get_data',methods=['GET','POST'])
-# def get_data():
-#     ref = db.reference('osm-data/analyzed/india/top_5/data')
-#     # return ref.get()
-#     if request.method == 'POST':
