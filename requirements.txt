@@ -2,4 +2,4 @@ flask
 flask_restful
 gunicorn
 pandas
-pyrebase
+pyrebase4
