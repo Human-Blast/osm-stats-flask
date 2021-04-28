@@ -17,6 +17,7 @@ firebaseConfig = {
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 db = firebase.database()
+store = firebase.storage()
 app = flask.Flask(__name__)
 api = Api(app)
 countries =['brazil','india','china','south africa','russia']
@@ -47,6 +48,24 @@ class CountryData(Resource):
 
         return "Invalid Data.Check the docs for the api usage" 
 
+class CSV_file(Resource):
+    
+    def get(self,country,category):
+        country = country.lower()
+        category = category.lower()
+        if(country in countries and category in category_):
+           download_csv(country,category)
+           return "Download Successsful"
+        return "Invalid Data.Check the docs for the API usage"
+
+    
+def download_csv(country,category):
+    store.child(country+"/"+category+".csv").download("./download/"+country+"_"+category+".csv")
+    os.remove("./download/"+country+"_"+category+".csv")
+
+
+
+api.add_resource(CSV_file,"/api/download/<string:country>/<string:category>")
 api.add_resource(CountryData, "/api/country/<string:name>/<string:category>")
 
 if __name__ == "__main__":
