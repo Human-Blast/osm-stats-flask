@@ -87,17 +87,16 @@ class JSON_CSV(Resource):
                 merge_df  = pd.concat(dfs_created) #.fillna(0).sort_values(df_column)
 
                 x = Data_Manipulation(merge_df, years, category, country)
-                fig = x.RefineData_and_GenerateGraph()
-                # plt.show(fig)
-                # print(type(fig))
-                file_name = 'test.jpg'
-                plt.savefig(file_name,bbox_inches='tight', dpi=300)
+                fig = x.RefineData_and_GenerateGraph('bar')
+                
+                file_name = 'test.svg'
+                plt.savefig(file_name,bbox_inches='tight')#, dpi=150)
                 # store.child("test.jpg").put('test.jpg')
                 # store.child(file_name).get_url
                 # os.remove(file_name)
                 # store.child(file_name).download("download",file_name)
 
-# C:\Users\Lucifer\#Projects\OpenStreetMapFlaskApp\osm-stats-flask\india_office.jpg
+
             # print(dates.val())
             # print(json_dict['20140101']['frequency'])
             # df = pd.DataFrame.from_dict(json_dict,orient='index')
@@ -108,7 +107,7 @@ class JSON_CSV(Resource):
 
 
 # monthly data of osm
-api.add_resource(JSON_CSV,"/api/jsoncsv/<string:country>/<string:category>")
+api.add_resource(JSON_CSV,"/api/pygraph/<string:country>/<string:category>")
 api.add_resource(CSV_file,"/api/download/<string:country>/<string:category>")
 api.add_resource(CountryData, "/api/country/<string:name>/<string:category>")
 
