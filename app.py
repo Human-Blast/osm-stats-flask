@@ -8,6 +8,7 @@ import json
 import os
 from helper_functions import *
 from DataRetrieve import *
+import matplotlib.pyplot as plt
 
 firebaseConfig = {
     "apiKey": "AIzaSyBTzzXFHncci7RanGMjNfduJ8_471RkYoU",
@@ -70,34 +71,39 @@ class JSON_CSV(Resource):
             category_data = db.child('/osm_data/analyzed/'+country+'/top_5/data/'+str(category_index)+'/'+category).get()
             json_dict = category_data.val()
             dates = db.child('/osm_data/dates/'+country).get()
-            dfs_created = []
 
-            for date in dates.val():
+            dfs_created = []
+            years = dates.val()
+
+            for date in years:
                 # for i in range(0,4):
                 # print(json_dict[str(date)])
                 df_name = country +'_'+ category
                 column_for_tag = category +'_'+ str(date)
-                globals()[df_name] = pd.DataFrame({column_for_tag : json_dict[str(date)]['tag_name'] ,'frequency'+'_'+ str(date) : json_dict[str(date)]['frequency']})
-                
+                globals()[df_name] = pd.DataFrame(json_dict[str(date)],index=[str(date) for i in range(5)])
                 dfs_created.append(globals()[df_name])
-                # print(df)
             
             if len(dfs_created) > 0:
-                merge_df  = pd.concat(dfs_created, axis=1) #.fillna(0).sort_values(df_column)
-                #print(merge_df)
+                merge_df  = pd.concat(dfs_created) #.fillna(0).sort_values(df_column)
 
-                # Graph generation here
-                #GenerateGraph(merge_df)
+                x = Data_Manipulation(merge_df, years, category, country)
+                fig = x.RefineData_and_GenerateGraph()
+                # plt.show(fig)
+                # print(type(fig))
+                file_name = 'test.jpg'
+                plt.savefig(file_name,bbox_inches='tight', dpi=300)
+                # store.child("test.jpg").put('test.jpg')
+                # store.child(file_name).get_url
+                # os.remove(file_name)
+                # store.child(file_name).download("download",file_name)
 
-
-
-
+# C:\Users\Lucifer\#Projects\OpenStreetMapFlaskApp\osm-stats-flask\india_office.jpg
             # print(dates.val())
             # print(json_dict['20140101']['frequency'])
             # df = pd.DataFrame.from_dict(json_dict,orient='index')
             # df.reset_index(level=0,inplace=True)
             # print(df)
-            return "Check console"
+            return "Bro sent okay chill"
         return "Invalid input"
 
 

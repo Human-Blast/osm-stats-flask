@@ -3,3 +3,5 @@ flask_restful
 gunicorn
 pandas
 pyrebase4
+matplotlib.pyplot
+seaborn
