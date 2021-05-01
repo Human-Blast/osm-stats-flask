@@ -75,7 +75,7 @@ class JSON_CSV(Resource):
             category_data = db.child('/osm_data/analyzed/'+country+'/top_5/data/'+str(category_index)+'/'+category).get()
             json_dict = category_data.val()
             dates = db.child('/osm_data/dates/'+country).get()
-
+            # print(dates.val().len)
             dfs_created = []
             years = dates.val()
 
@@ -98,6 +98,7 @@ class JSON_CSV(Resource):
                 return img.ImageToBase64()
             else:
                 return "error obtaining graph image"
+
 
         return "Invalid input"
 

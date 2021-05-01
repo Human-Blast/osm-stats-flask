@@ -86,6 +86,7 @@ class Data_Manipulation:
                 sns.set_theme(font_scale=2)
                     
                 bar = sns.barplot(ax=ax[i], data=globals()[df_individual], 
+
                             x ='tag_name', y='frequency',estimator=sum,
                             saturation=0.5, palette="flare")
                             
