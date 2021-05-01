@@ -90,12 +90,11 @@ class JSON_CSV(Resource):
             
             if len(dfs_created) > 0:
                 merge_df  = pd.concat(dfs_created) #.fillna(0).sort_values(df_column)
-
                 x = Data_Manipulation(merge_df, years, category, country)
                 fig = x.RefineData_and_GenerateGraph('bar')
-                print(type(fig))
-                file_name = 'test.png'
-                plt.savefig(file_name,bbox_inches='tight', dpi=100)
+                # print(type(fig))
+                # file_name = 'test.png'
+                # plt.savefig(file_name,bbox_inches='tight', dpi=100)
                 # store.child("test.jpg").put('test.jpg')
                 # store.child(file_name).get_url
                 # os.remove(file_name)
