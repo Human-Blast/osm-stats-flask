@@ -57,8 +57,8 @@ class Data_Manipulation:
                     if c >= len(dfs_created_in_RefineData):
                         break
 
-                    print(c)
-                    print(dfs_created_in_RefineData[c])
+                    # print(c)
+                    # print(dfs_created_in_RefineData[c])
                     df_individual = dfs_created_in_RefineData[c]
                     sns.set_theme(font_scale=2)
                     
