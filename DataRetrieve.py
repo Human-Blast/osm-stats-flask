@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from math import sqrt
 from itertools import count, islice
+import numpy as np
+from matplotlib import cm
 
 class Data_Manipulation:
 
@@ -22,22 +24,71 @@ class Data_Manipulation:
 
     # graph generation begins here
     def GenerateBarGraph_in_subplots(self, dfs_created_in_RefineData):
-        row_col = self.get_factors(len(self.years))
-        fig, ax = plt.subplots(nrows=row_col[0], ncols=row_col[1],figsize = (25, 25))
+        """Generate bar plot from matplotlib """
+        if len(self.years) > 5 and self.is_prime(len(self.years)): #if plots needed are more than 5 and is prime
+            row_col = self.get_factors(len(self.years)+1) #add a number and make it even, then get factors
+        else:
+            row_col = self.get_factors(len(self.years)) #get factors as it is
+
         ct=0
+        
+    
+        if row_col[0] > 1:
+            fig, ax = plt.subplots(row_col[0], row_col[1], figsize=(30, 25)) #init figure with desired subplots
 
-        for row in ax:
-            for col in row:
+            if len(self.years) > 5 and self.is_prime(len(self.years)): #delete redundant subplot
+                fig.delaxes(ax[row_col[0]-1,row_col[1]-1])
+
+            for row in ax:
+                for col in row:
+                    if ct >= len(dfs_created_in_RefineData):
+                        break
+
+                    df_individual = dfs_created_in_RefineData[ct] #extract individual df
+                    
+                    my_colors = [(x/10.0, x/15.0, 0.75) for x in range(len(df_individual))]
+                    # my_colors = cm.inferno_r(np.linspace(.4, .8, 20))
+                    col.bar(globals()[df_individual]['tag_name'], globals()[df_individual]['frequency'],alpha=0.75,color=my_colors) #plot bar graph
+                    col.set_title(str(self.years[ct]),fontdict={'fontsize': 20})
+                    col.set_xticklabels(globals()[df_individual]['tag_name'],rotation=90,fontdict={'fontsize': 19})
+                    col.grid(axis='y',which='both',drawstyle= 'steps-pre')
+                    col.set_axisbelow(True)
+                    # col.set_xlabel('Tag Name', fontsize=19)
+                    # col.set_ylabel('Frequency', fontsize=19)
+                    ct += 1
+
+                if ct >= len(dfs_created_in_RefineData):
+                    break
+            
+            
+            fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
+            fig.tight_layout()
+        
+            return fig
+
+        else:
+            fig, ax = plt.subplots(nrows=row_col[0], ncols=row_col[1],figsize = (25, 10))
+
+            for i in ax:
                 df_individual = dfs_created_in_RefineData[ct]
+                my_colors = [(x/10.0, x/15.0, 0.75) for x in range(len(df_individual))]
+                i.bar(globals()[df_individual]['tag_name'], globals()[df_individual]['frequency'],alpha=0.6,color=my_colors) 
+                i.set_title(str(self.years[ct]),fontdict={'fontsize': 20})
+                i.set_xticklabels(globals()[df_individual]['tag_name'],rotation=90,fontdict={'fontsize': 19})
+                col.grid(axis='y',which='both',drawstyle= 'steps-pre')
+                col.set_axisbelow(True)
+                # i.set_xlabel('Tag Name', fontsize=19)
+                # i.set_ylabel('Frequency', fontsize=19)
                 ct += 1 
-                
-                col.bar(globals()[df_individual]['tag_name'], globals()[df_individual]['frequency'])
-                col.set_title(str(self.country)+'_'+str(self.category))
 
-        return fig 
+            fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
+            fig.tight_layout()
+            
+            return fig
+            
 
     def GenerateBarGraph_seaborn(self, dfs_created_in_RefineData):
-        
+        """Generate Bar plot from seaborn"""
         if len(self.years) > 5 and self.is_prime(len(self.years)):
             row_col = self.get_factors(len(self.years)+1)
         else:
@@ -53,7 +104,7 @@ class Data_Manipulation:
 
             for i in range(row_col[0]):
                 for j in range(row_col[1]):
-                    
+
                     if c >= len(dfs_created_in_RefineData):
                         break
 
@@ -102,7 +153,7 @@ class Data_Manipulation:
             dfs_created_in_RefineData.append(df_name)
             
         if plot_kind.lower() == 'bar':
-            return self.GenerateBarGraph_seaborn(dfs_created_in_RefineData)
+            return self.GenerateBarGraph_in_subplots(dfs_created_in_RefineData)
         
         
 
