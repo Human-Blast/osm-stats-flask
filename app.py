@@ -7,12 +7,11 @@ import datetime
 import pandas as pd
 import json
 import os
-from helper_functions import *
-from DataRetrieve import *
 import matplotlib.pyplot as plt
-import base64
-from PIL import Image
-from io import BytesIO
+from DataRetrieve import *
+from ImageProcess import *
+from helper_functions import *
+
 
 firebaseConfig = {
     "apiKey": "AIzaSyBTzzXFHncci7RanGMjNfduJ8_471RkYoU",
@@ -93,40 +92,14 @@ class JSON_CSV(Resource):
                 x = Data_Manipulation(merge_df, years, category, country)
                 fig = x.RefineData_and_GenerateGraph('bar')
                 # print(type(fig))
-                file_name = 'test.png'
-                plt.savefig(file_name,bbox_inches='tight', dpi=100)
-                # store.child("test.jpg").put('test.jpg')
-                # store.child(file_name).get_url
-                # os.remove(file_name)
-                # store.child(file_name).download("download",file_name)
-            def fig2img(fig):
-                """Convert a Matplotlib figure to a PIL Image and return it"""
-                import io
-                buf = io.BytesIO()
-                fig.savefig(buf)
-                buf.seek(0)
-                img = Image.open(buf)
-                return img  
+                # file_name = 'test.svg'
+                # plt.savefig(file_name, dpi=100) 
+                img = ImageProcess(fig)
+                return img.ImageToBase64()
+            else:
+                return "error obtaining graph image"
 
-            img = fig2img(fig)
-            # print(type(img))
-            # print(dates.val())
-            # print(json_dict['20140101']['frequency'])
-            # df = pd.DataFrame.from_dict(json_dict,orient='index')
-            # df.reset_index(level=0,inplace=True)
-            # print(df)
-            # with open(img, 'rb') as binary_file:
-            #     binary_file_data = binary_file.read()
-            #     base64_encoded_data = base64.b64encode(fig)
-            #     base64_message = base64_encoded_data.decode('utf-8')
-            
-            output_buffer = BytesIO()
-            img.save(output_buffer, format='png')
-            binary_data = output_buffer.getvalue()
-            base64_data = base64.b64encode(binary_data)
-            base64_message = base64_data.decode('utf-8')
 
-            return base64_message
         return "Invalid input"
 
 
