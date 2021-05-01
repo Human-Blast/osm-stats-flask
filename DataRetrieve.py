@@ -75,8 +75,8 @@ class Data_Manipulation:
                 i.bar(globals()[df_individual]['tag_name'], globals()[df_individual]['frequency'],alpha=0.6,color=my_colors) 
                 i.set_title(str(self.years[ct]),fontdict={'fontsize': 20})
                 i.set_xticklabels(globals()[df_individual]['tag_name'],rotation=90,fontdict={'fontsize': 19})
-                col.grid(axis='y',which='both',drawstyle= 'steps-pre')
-                col.set_axisbelow(True)
+                i.grid(axis='y',which='both',drawstyle= 'steps-pre')
+                i.set_axisbelow(True)
                 # i.set_xlabel('Tag Name', fontsize=19)
                 # i.set_ylabel('Frequency', fontsize=19)
                 ct += 1 
