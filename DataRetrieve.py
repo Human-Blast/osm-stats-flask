@@ -41,8 +41,8 @@ class Data_Manipulation:
         for i in range(row_col[0]):
             for j in range(row_col[1]):
                 df_individual = dfs_created_in_RefineData[c]
-                sns.set(font_scale = 2)
-                
+                # sns.set(font_scale = 2)
+                sns.set_theme(font_scale = 2)
                 bar = sns.barplot(ax=ax[i,j], data=globals()[df_individual], 
                             x ='tag_name', y='frequency',estimator=sum,
                             saturation=0.5, palette="flare")

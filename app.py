@@ -28,7 +28,7 @@ store = firebase.storage()
 app = flask.Flask(__name__)
 CORS(app)
 api = Api(app)
-countries =['brazil','india','china','south africa','russia']
+countries =['brazil','india','china','southafrica','russia']
 category_ = ['building','leisure','amenity','office','man_made','advertising','shop','craft','historic','landuse','tourism','boundary']
 
 class CountryData(Resource):
@@ -76,7 +76,7 @@ class JSON_CSV(Resource):
             category_data = db.child('/osm_data/analyzed/'+country+'/top_5/data/'+str(category_index)+'/'+category).get()
             json_dict = category_data.val()
             dates = db.child('/osm_data/dates/'+country).get()
-
+            # print(dates.val().len)
             dfs_created = []
             years = dates.val()
 
@@ -93,8 +93,8 @@ class JSON_CSV(Resource):
                 x = Data_Manipulation(merge_df, years, category, country)
                 fig = x.RefineData_and_GenerateGraph('bar')
                 # print(type(fig))
-                # file_name = 'test.png'
-                # plt.savefig(file_name,bbox_inches='tight', dpi=100)
+                file_name = 'test.png'
+                plt.savefig(file_name,bbox_inches='tight', dpi=100)
                 # store.child("test.jpg").put('test.jpg')
                 # store.child(file_name).get_url
                 # os.remove(file_name)
