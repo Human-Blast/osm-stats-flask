@@ -1,5 +1,8 @@
 flask
 flask_restful
+flask_cors
 gunicorn
 pandas
 pyrebase4
+matplotlib
+seaborn
