@@ -11,18 +11,17 @@ class Data_Manipulation:
         self.category = category 
         self.country = country
 
-    def get_factors(self, n):
+    def get_factors(self, n): #get factors of a number in pairs
         for i in range(1, int(pow(n, 1 / 2))+1):
             if n % i == 0:
                 res =  [i,int(n / i)]
         return res
     
-    def is_prime(self, n):
+    def is_prime(self, n): #check if a number is prime
         return n > 1 and all(n % i for i in islice(count(2), int(sqrt(n)-1)))
 
     # graph generation begins here
     def GenerateBarGraph_in_subplots(self, dfs_created_in_RefineData):
-
         row_col = self.get_factors(len(self.years))
         fig, ax = plt.subplots(nrows=row_col[0], ncols=row_col[1],figsize = (25, 25))
         ct=0
@@ -54,17 +53,15 @@ class Data_Manipulation:
 
             for i in range(row_col[0]):
                 for j in range(row_col[1]):
+                    
                     if c >= len(dfs_created_in_RefineData):
                         break
 
-                    # print(c)
-                    # print(dfs_created_in_RefineData[c])
                     df_individual = dfs_created_in_RefineData[c]
                     sns.set_theme(font_scale=2)
                     
                     bar = sns.barplot(ax=ax[i,j], data=globals()[df_individual], 
-                                x ='tag_name', y='frequency',estimator=sum,
-                                saturation=0.5, palette="flare")
+                                x ='tag_name', y='frequency', palette="flare")
                             
                     bar.set(title=str(self.years[c]))
                     bar.set_xticklabels(bar.get_xticklabels(),rotation=90,fontdict={'fontsize': 19})
@@ -76,7 +73,6 @@ class Data_Manipulation:
 
             plt.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50) 
             fig.tight_layout()
-            c=0
             return fig
 
         else:
@@ -86,9 +82,7 @@ class Data_Manipulation:
                 sns.set_theme(font_scale=2)
                     
                 bar = sns.barplot(ax=ax[i], data=globals()[df_individual], 
-
-                            x ='tag_name', y='frequency',estimator=sum,
-                            saturation=0.5, palette="flare")
+                            x ='tag_name', y='frequency', palette="flare") #estimator=sum
                             
                 bar.set(title=str(self.years[c]))
                 bar.set_xticklabels(bar.get_xticklabels(),rotation=90,fontdict={'fontsize': 19})
@@ -96,12 +90,10 @@ class Data_Manipulation:
 
             plt.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50) 
             fig.tight_layout()
-            c=0
             return fig    
 
     def RefineData_and_GenerateGraph(self, plot_kind):
-        df = self.data
-        grouped_df = df.groupby(df.index)
+        grouped_df = self.data.groupby(self.data.index)
         dfs_created_in_RefineData = []
 
         for year in self.years:

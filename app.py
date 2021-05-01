@@ -84,7 +84,7 @@ class JSON_CSV(Resource):
                 # print(json_dict[str(date)])
                 df_name = country +'_'+ category
                 column_for_tag = category +'_'+ str(date)
-                globals()[df_name] = pd.DataFrame(json_dict[str(date)],index=[str(date) for i in range(5)])
+                globals()[df_name] = pd.DataFrame(json_dict[str(date)],index=[str(date) for i in range(len(json_dict[str(date)]['frequency'])) ])
                 dfs_created.append(globals()[df_name])
             
             if len(dfs_created) > 0:
@@ -92,8 +92,9 @@ class JSON_CSV(Resource):
                 x = Data_Manipulation(merge_df, years, category, country)
                 fig = x.RefineData_and_GenerateGraph('bar')
                 # print(type(fig))
-                # file_name = 'test.svg'
-                # plt.savefig(file_name, dpi=100) 
+
+                file_name = 'test.svg'
+                plt.savefig(file_name, dpi=100) 
                 img = ImageProcess(fig)
                 return img.ImageToBase64()
             else:
