@@ -93,8 +93,8 @@ class JSON_CSV(Resource):
                 fig = x.RefineData_and_GenerateGraph('bar')
                 # print(type(fig))
 
-                file_name = 'test.svg'
-                plt.savefig(file_name, dpi=100) 
+                # file_name = 'test.svg'
+                # plt.savefig(file_name, dpi=100) 
                 img = ImageProcess(fig)
                 return img.ImageToBase64()
             else:
@@ -103,8 +103,33 @@ class JSON_CSV(Resource):
 
         return "Invalid input"
 
+class GetData_Year(Resource):
+    def get(self,country,category,year):
+        country = country.lower()
+        category = category.lower() 
+        dates = db.child('/osm_data/dates/'+country).get()
+        
+        if(country in countries and category in category_ and year in dates.val()):
+            category_index = category_.index(category)
+            category_data = db.child('/osm_data/analyzed/'+country+'/top_10/data/'+str(category_index)+'/'+category+'/'+str(year)).get()
+            json_dict = category_data.val()
+            df = pd.DataFrame(json_dict,index=[str(year) for i in range(len(json_dict['frequency']))])
 
+            #send em to the ranch
+            x = Data_Manipulation(df, [year], category, country)
+            fig = x.RefineData_and_GenerateGraph('bar')
+
+            # file_name = 'test.svg'
+            # plt.savefig(file_name, dpi=100) 
+            # print(df)
+            img = ImageProcess(fig)
+            return img.ImageToBase64()
+            
+        return "Invalid Request"
+
+        
 # monthly data of osm
+api.add_resource(GetData_Year,"/api/pygraph/<string:country>/<string:category>/<int:year>")
 api.add_resource(JSON_CSV,"/api/pygraph/<string:country>/<string:category>")
 api.add_resource(CSV_file,"/api/download/<string:country>/<string:category>")
 api.add_resource(CountryData, "/api/country/<string:name>/<string:category>")
