@@ -152,7 +152,7 @@ class Data_Manipulation:
 
         ax.set(title=str(year))
         ax.set_xticklabels(ax.get_xticklabels(),rotation=45,fontdict={'fontsize': 19})
-        fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper() +'-'+str(year), fontsize=50)
+        fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
         fig.tight_layout()
 
         return fig
