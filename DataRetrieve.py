@@ -24,7 +24,7 @@ class Data_Manipulation:
 
     # graph generation begins here
     def GenerateBarGraph_in_subplots(self, dfs_created_in_RefineData):
-        """Generate bar plot from matplotlib """
+        """Generate bar plot from matplotlib for all years"""
         if len(self.years) > 5 and self.is_prime(len(self.years)): #if plots needed are more than 5 and is prime
             row_col = self.get_factors(len(self.years)+1) #add a number and make it even, then get factors
         else:
@@ -88,7 +88,7 @@ class Data_Manipulation:
             
 
     def GenerateBarGraph_seaborn(self, dfs_created_in_RefineData):
-        """Generate Bar plot from seaborn"""
+        """Generate Bar plot from seaborn for all years"""
         if len(self.years) > 5 and self.is_prime(len(self.years)):
             row_col = self.get_factors(len(self.years)+1)
         else:
@@ -143,20 +143,38 @@ class Data_Manipulation:
             fig.tight_layout()
             return fig    
 
+    def GenerateGraph_seaborn_year(self,df_ofGivenYear,year):
+        """Bar plot for one year, one category of a country"""
+        fig = plt.figure(figsize = (20, 15))
+        sns.set_theme(font_scale=2)
+        ax = sns.barplot( data=df_ofGivenYear, 
+                        x ='tag_name', y='frequency', palette="flare")
+
+        ax.set(title=str(year))
+        ax.set_xticklabels(ax.get_xticklabels(),rotation=45,fontdict={'fontsize': 19})
+        fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper() +'-'+str(year), fontsize=50)
+        fig.tight_layout()
+
+        return fig
+
+
     def RefineData_and_GenerateGraph(self, plot_kind):
-        grouped_df = self.data.groupby(self.data.index)
-        dfs_created_in_RefineData = []
+        if len(self.years) > 1:
+            grouped_df = self.data.groupby(self.data.index)
+            dfs_created_in_RefineData = []
 
-        for year in self.years:
-            df_name = 'df_'+ str(year)
-            globals()[df_name] = grouped_df.get_group(str(year))
-            dfs_created_in_RefineData.append(df_name)
-            
-        if plot_kind.lower() == 'bar':
-            return self.GenerateBarGraph_in_subplots(dfs_created_in_RefineData)
-        
-        
+            for year in self.years:
+                df_name = 'df_'+ str(year)
+                globals()[df_name] = grouped_df.get_group(str(year))
+                dfs_created_in_RefineData.append(df_name)
+                
+            if plot_kind.lower() == 'bar':
+                return self.GenerateBarGraph_in_subplots(dfs_created_in_RefineData)
 
+        else:
+           if plot_kind.lower() == 'bar':
+               return self.GenerateGraph_seaborn_year(self.data,str(self.years[0]))
+        
     
 
         
