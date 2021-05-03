@@ -127,8 +127,22 @@ class GetData_Year(Resource):
             
         return "Invalid Request"
 
+class GetCount(Resource):
+    def get(self,country,category):
+        country = country.lower()
+        category = category.lower() 
+        dates = db.child('/osm_data/dates/'+country).get()
+        if(country in countries and category in category_ ):
+            category_data = db.child('/osm_data/analyzed/'+country+'/count_top_10/'+category).get()
+            # insert you code here
+            
+            return category_data.val()
+        
+        return 'Inavlid data'
+
         
 # monthly data of osm
+api.add_resource(GetCount,"/api/countgraph/<string:country>/<string:category>")
 api.add_resource(GetData_Year,"/api/pygraph/<string:country>/<string:category>/<int:year>")
 api.add_resource(JSON_CSV,"/api/pygraph/<string:country>/<string:category>")
 api.add_resource(CSV_file,"/api/download/<string:country>/<string:category>")
