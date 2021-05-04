@@ -9,7 +9,6 @@ import json
 import os
 import matplotlib.pyplot as plt
 from DataRetrieve import *
-from ImageProcess import *
 from helper_functions import *
 
 
@@ -90,13 +89,9 @@ class JSON_CSV(Resource):
             if len(dfs_created) > 0:
                 merge_df  = pd.concat(dfs_created) #.fillna(0).sort_values(df_column)
                 x = Data_Manipulation(data = merge_df, years = years,  country = country, category = category)
-                fig = x.RefineData_and_GenerateGraph(plot_kind='bar')
-                # print(type(fig))
-
-                # file_name = 'test.svg'
-                # plt.savefig(file_name, dpi=100) 
-                img = ImageProcess(fig)
-                return img.ImageToBase64()
+                img = x.RefineData_and_GenerateGraph(plot_kind='bar')
+                
+                return img
             else:
                 return "error obtaining graph image"
 
@@ -117,13 +112,9 @@ class GetData_Year(Resource):
 
             #send em to the ranch
             x = Data_Manipulation(data = df, years= [year], category= category, country=country)
-            fig = x.RefineData_and_GenerateGraph(plot_kind = 'bar')
+            img = x.RefineData_and_GenerateGraph(plot_kind = 'bar')
 
-            # file_name = 'test.svg'
-            # plt.savefig(file_name, dpi=100) 
-            # print(df)
-            img = ImageProcess(fig)
-            return img.ImageToBase64()
+            return img
             
         return "Invalid Request"
 

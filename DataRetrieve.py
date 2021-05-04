@@ -8,6 +8,7 @@ from matplotlib import cm
 import pandas as pd
 # from pprint import pprint
 # import inspect
+from ImageProcess import *
 
 @dataclass(frozen=True, order=True)
 class Data_Manipulation:
@@ -17,6 +18,14 @@ class Data_Manipulation:
     years: list
     category: str
     country: str
+
+    def convertImage(self, fig):
+        """Converts image to Base64 string"""
+        file_name = 'test.svg'
+        plt.savefig(file_name, dpi=100) 
+
+        _img_ = ImageProcess(fig)
+        return _img_.ImageToBase64()
 
     def get_factors(self, n): #get factors of a number in pairs
         for i in range(1, int(pow(n, 1 / 2))+1):
@@ -68,8 +77,8 @@ class Data_Manipulation:
             
             fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
             fig.tight_layout()
-        
-            return fig
+         
+            return self.convertImage(fig)
 
         else:
             fig, ax = plt.subplots(nrows=row_col[0], ncols=row_col[1],figsize = (25, 10))
@@ -89,7 +98,8 @@ class Data_Manipulation:
             fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
             fig.tight_layout()
             
-            return fig
+            
+            return self.convertImage(fig)
             
 
     def GenerateBarGraph_seaborn(self, dfs_created_in_RefineData):
@@ -129,7 +139,8 @@ class Data_Manipulation:
 
             plt.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50) 
             fig.tight_layout()
-            return fig
+
+            return self.convertImage(fig)
 
         else:
             fig, ax = plt.subplots(nrows=row_col[0], ncols=row_col[1],figsize = (25, 10))
@@ -146,7 +157,8 @@ class Data_Manipulation:
 
             plt.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50) 
             fig.tight_layout()
-            return fig    
+
+            return self.convertImage(fig)    
 
     def GenerateGraph_seaborn_year(self,df_ofGivenYear,year):
         """Bar plot for one year, one category of a country"""
@@ -160,7 +172,7 @@ class Data_Manipulation:
         fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
         fig.tight_layout()
 
-        return fig
+        return self.convertImage(fig)
 
 
     def RefineData_and_GenerateGraph(self, plot_kind):
