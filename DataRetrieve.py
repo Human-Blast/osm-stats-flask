@@ -1,17 +1,22 @@
+from dataclasses import dataclass, astuple, asdict
 import matplotlib.pyplot as plt
 import seaborn as sns
 from math import sqrt
 from itertools import count, islice
 import numpy as np
 from matplotlib import cm
+import pandas as pd
+# from pprint import pprint
+# import inspect
 
+@dataclass(frozen=True, order=True)
 class Data_Manipulation:
+    """A class for Data manipulation and Graph generation"""
 
-    def __init__(self, data, years, category, country):
-        self.data = data
-        self.years = years
-        self.category = category 
-        self.country = country
+    data: pd.DataFrame()
+    years: list
+    category: str
+    country: str
 
     def get_factors(self, n): #get factors of a number in pairs
         for i in range(1, int(pow(n, 1 / 2))+1):
@@ -159,21 +164,27 @@ class Data_Manipulation:
 
 
     def RefineData_and_GenerateGraph(self, plot_kind):
-        if len(self.years) > 1:
-            grouped_df = self.data.groupby(self.data.index)
-            dfs_created_in_RefineData = []
+        """Does the job it is told to"""
+        # pprint(inspect.getmembers(Data_Manipulation, inspect.isfunction))
 
-            for year in self.years:
-                df_name = 'df_'+ str(year)
-                globals()[df_name] = grouped_df.get_group(str(year))
-                dfs_created_in_RefineData.append(df_name)
-                
-            if plot_kind.lower() == 'bar':
-                return self.GenerateBarGraph_in_subplots(dfs_created_in_RefineData)
+        try:
+            if len(self.years) > 1:
+                grouped_df = self.data.groupby(self.data.index)
+                dfs_created_in_RefineData = []
 
-        else:
-           if plot_kind.lower() == 'bar':
-               return self.GenerateGraph_seaborn_year(self.data,str(self.years[0]))
+                for year in self.years:
+                    df_name = 'df_'+ str(year)
+                    globals()[df_name] = grouped_df.get_group(str(year))
+                    dfs_created_in_RefineData.append(df_name)
+                    
+                if plot_kind.lower() == 'bar':
+                    return self.GenerateBarGraph_in_subplots(dfs_created_in_RefineData)
+
+            else:
+                if plot_kind.lower() == 'bar':
+                    return self.GenerateGraph_seaborn_year(self.data,str(self.years[0]))
+        except Exception:
+            return Exception
         
     
 

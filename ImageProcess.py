@@ -3,10 +3,12 @@ import base64
 from PIL import Image
 from io import BytesIO
 
+
 class ImageProcess:
+    
     def __init__(self,fig):
         self.fig = fig
-
+    
     def fig2img(self):
         """Convert a Matplotlib figure to a PIL Image and return it"""
         buf = io.BytesIO()
