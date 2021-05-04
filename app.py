@@ -89,8 +89,8 @@ class JSON_CSV(Resource):
             
             if len(dfs_created) > 0:
                 merge_df  = pd.concat(dfs_created) #.fillna(0).sort_values(df_column)
-                x = Data_Manipulation(merge_df, years, category, country)
-                fig = x.RefineData_and_GenerateGraph('bar')
+                x = Data_Manipulation(data = merge_df, years = years,  country = country, category = category)
+                fig = x.RefineData_and_GenerateGraph(plot_kind='bar')
                 # print(type(fig))
 
                 # file_name = 'test.svg'
@@ -116,8 +116,8 @@ class GetData_Year(Resource):
             df = pd.DataFrame(json_dict,index=[str(year) for i in range(len(json_dict['frequency']))])
 
             #send em to the ranch
-            x = Data_Manipulation(df, [year], category, country)
-            fig = x.RefineData_and_GenerateGraph('bar')
+            x = Data_Manipulation(data = df, years= [year], category= category, country=country)
+            fig = x.RefineData_and_GenerateGraph(plot_kind = 'bar')
 
             # file_name = 'test.svg'
             # plt.savefig(file_name, dpi=100) 
