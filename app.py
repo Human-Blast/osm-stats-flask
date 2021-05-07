@@ -18,8 +18,8 @@ app = flask.Flask(__name__)
 CORS(app)
 api = Api(app)
 
-countries =['brazil','india','china','southafrica','russia']
-category_ = ['building','leisure','amenity','office','man_made','advertising','shop','craft','historic','landuse','tourism','boundary']
+countries = db.child('/countries').get().val()
+category_ = db.child('/categories').get().val()
 
 class CSV_file(Resource):
     def get(self,country,category):
@@ -68,7 +68,8 @@ class GetCount(Resource):
         if(country in countries and category in category_ ):
             category_data = db.child('/osm_data/analyzed/'+country+'/count_top_10/'+category).get()
             # insert you code here
-            
+            df = pd.DataFrame(category_data.val())
+            print(df)
             return category_data.val()
         
         return 'Inavlid data'

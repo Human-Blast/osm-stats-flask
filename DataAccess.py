@@ -49,7 +49,7 @@ class DataAccess:
 
     def ValidateRequestAllYears(self):
         """Validates given request"""
-        if(self.country.lower() in self.countriesInDB and self.category.lower() in self.categoriesInDB):
+        if(self.country in self.countriesInDB and self.category in self.categoriesInDB):
             return True
         
         return False
@@ -93,6 +93,27 @@ class DataAccess:
        
         return None 
 
+
+    def GetTop10_JSON_DataofAllYearsMerged(self):
+        """Get top 10 JSON data from merged data"""
+        
+        if self.ValidateRequestAllYears():
+            return self.db.child('/osm_data/analyzed/ '+ self.country + '/count_top_10/' + self.category).get().val()
+        
+        return None 
+
+    def GetTop10_DataFrame_DataofAllYearsMerged(self):
+        """Get top 10 DataFrame data from merged data"""
+
+        json_data = self.GetTop10_JSON_DataofAllYearsMerged()
+
+        if json_data != None:
+            return pd.DataFrame(json_data.val())
+
+        return pd.DataFrame()
+
+
+
     def GetTop10_DataFrame_DataOfOneYear(self):
         """Returns pd.DataFrame Data having Top 10 category details of one year of a country"""
 
@@ -133,13 +154,29 @@ class DataAccess:
         return pd.DataFrame()
 
 
-    def GenerateAndSendDataTo_DataProcess(self, plot_kind, top10 = False):
+    def GenerateAndSendDataTo_DataProcess(self, plot_kind, top10 = False, scatterTop10 = False):
         """Gets data and sends it to DataProcess for Graph generation"""
 
         self.CheckForList()
         self.ConvertValues()
 
-        if top10 == True:
+        if scatterTop10 == True and top10 == True:
+            return None
+
+        if scatterTop10 == True and top10 == False:
+            try:
+                data = self.GetTop10_DataFrame_DataofAllYearsMerged()
+
+                if data.empty:
+                    return None
+
+                x = Data_Manipulation(data = data, country = self.country, category = self.category)
+                return x.RefineData_and_GenerateGraph(plot_kind)
+                
+            except Exception:
+                return Exception
+
+        if top10 == True and scatterTop10 == False:
             try:
                 data = self.GetTop10_DataFrame_DataOfOneYear()
 

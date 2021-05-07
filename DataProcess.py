@@ -1,4 +1,4 @@
-from dataclasses import dataclass, astuple, asdict
+from dataclasses import dataclass, astuple, asdict, field
 import matplotlib.pyplot as plt
 import seaborn as sns
 from math import sqrt
@@ -10,12 +10,12 @@ import pandas as pd
 # import inspect
 from ImageProcess import *
 
-@dataclass(frozen=True, order=True)
+@dataclass(order=True)
 class Data_Manipulation:
     """A class for Data manipulation and Graph generation"""
 
     data: pd.DataFrame
-    years: list
+    years: list = field(default_factory = list)
     category: str
     country: str
 
