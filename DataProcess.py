@@ -192,9 +192,11 @@ class Data_Manipulation:
                 if plot_kind.lower() == 'bar':
                     return self.GenerateBarGraph_in_subplots(dfs_created_in_RefineData)
 
-            else:
+            elif len(self.years) == 1:
                 if plot_kind.lower() == 'bar':
                     return self.GenerateGraph_seaborn_year(self.data,str(self.years[0]))
+
+            return "Graph could not be generated"
         except Exception:
             return Exception
         

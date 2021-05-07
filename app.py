@@ -33,34 +33,32 @@ class CSV_file(Resource):
 class JSON_CSV(Resource):
     def get(self,country,category): 
         try:
-            da = DataAccess(db, country, category, countries, category_)
+            da = DataAccess(db, country = country, category = category, countriesInDB = countries, categoriesInDB = category_)
             img = da.GenerateAndSendDataTo_DataProcess('bar')
+
+            if img == None:
+                return "Invalid Request"
 
             return img
 
         except Exception:
-            # return "Error occured"
+            # return "Invalid Request"
             return Exception
 
 class GetData_Year(Resource):
     def get(self,country,category,year):
-        country = country.lower()
-        category = category.lower() 
-        dates = db.child('/osm_data/dates/'+country).get()
-        
-        if(country in countries and category in category_ and year in dates.val()):
-            category_index = category_.index(category)
-            category_data = db.child('/osm_data/analyzed/'+country+'/top_10/data/'+str(category_index)+'/'+category+'/'+str(year)).get()
-            json_dict = category_data.val()
-            df = pd.DataFrame(json_dict,index=[str(year) for i in range(len(json_dict['frequency']))])
-
-            #send em to the ranch
-            x = Data_Manipulation(data = df, years= [year], category= category, country=country)
-            img = x.RefineData_and_GenerateGraph(plot_kind = 'bar')
+        try:
+            da = DataAccess(db, country = country, category = category, countriesInDB = countries, categoriesInDB = category_, allYears = year)
+            img = da.GenerateAndSendDataTo_DataProcess('bar', top10=True)
+            
+            if img == None:
+                return "Invalid Request"
 
             return img
-            
-        return "Invalid Request"
+
+        except Exception:
+            return Exception
+    
 
 class GetCount(Resource):
     def get(self,country,category):

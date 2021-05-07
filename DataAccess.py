@@ -29,12 +29,23 @@ class DataAccess:
     """Class for validations of requests and Data Access"""
 
     db: pyrebase.pyrebase.Database 
-    country: str
-    category: str
+    country: str 
+    category: str 
     countriesInDB: list
     categoriesInDB: list
-    allYears:list = field(init=False, default_factory = list)
+    allYears:list = field(default_factory = list)
     
+    def ConvertValues(self):
+        """Converts string value to lowercase"""
+
+        self.country = self.country.lower()
+        self.category = self.category.lower()
+
+    def CheckForList(self):
+        """Check for list to make it foolproof because I'm an idiot"""
+
+        if type(self.allYears) != list:
+            self.allYears = [self.allYears]
 
     def ValidateRequestAllYears(self):
         """Validates given request"""
@@ -43,10 +54,10 @@ class DataAccess:
         
         return False
 
-    def ValidateRequestOneYear(self, year):
+    def ValidateRequestOneYear(self, yearsInDB):
         """Validates given request for given one year"""
         
-        if(self.country.lower() in self.countriesInDB and self.category.lower() in self.categoriesInDB and year in self.allYears):
+        if(self.country in self.countriesInDB and self.category in self.categoriesInDB and self.allYears[0] in yearsInDB):
             return True
         
         return False
@@ -67,22 +78,33 @@ class DataAccess:
         return None
 
 
-    def GetTop10_DataFrame_DataOfOneYear(self):
-        """Returns pd.DataFrame Data having Top 10 category details of one year of a country"""
-
-        self.allYears = self.db.child('/osm_data/dates/'+self.country).get().val()
+    def GetTop10_JSON_DataOfOneYear(self):
+        """Returns JSON Data having Top 10 category details of one year of a country"""
+          
+        yearsInDB = self.db.child('/osm_data/dates/'+self.country).get().val()
+        
 
         if len(self.allYears) == 1:
             year = str(self.allYears[0])
-            if self.ValidateRequestOneYear(year):
+            if self.ValidateRequestOneYear(yearsInDB):
                 category_index = self.categoriesInDB.index(self.category)
-                json_dict = self.db.child('/osm_data/analyzed/' + self.country + '/top_10/data/' + str(category_index) + '/' + self.category + '/' + year).get().val()
-                df = pd.DataFrame(json_dict,index=[year for i in range(len(json_dict['frequency']))])
-                
-                return df #return dataframe
-                
-        return pd.DataFrame() #return empty dataframe
 
+                return self.db.child('/osm_data/analyzed/' + self.country + '/top_10/data/' + str(category_index) + '/' + self.category + '/' + year).get().val()
+       
+        return None 
+
+    def GetTop10_DataFrame_DataOfOneYear(self):
+        """Returns pd.DataFrame Data having Top 10 category details of one year of a country"""
+
+        json_data = self.GetTop10_JSON_DataOfOneYear()
+
+        if json_data != None:
+            df = pd.DataFrame(json_data,index=[str(self.allYears) for i in range(len(json_data['frequency']))])
+    
+            return df #return dataframe
+
+        return pd.DataFrame()
+            
 
     def GetTop5_DataFrame_DataOfAllYears(self):
         """Returns pandas.DataFrame Data having Top 5 category details for all years of a country"""
@@ -111,17 +133,33 @@ class DataAccess:
         return pd.DataFrame()
 
 
-    def GenerateAndSendDataTo_DataProcess(self, plot_kind):
+    def GenerateAndSendDataTo_DataProcess(self, plot_kind, top10 = False):
         """Gets data and sends it to DataProcess for Graph generation"""
+
+        self.CheckForList()
+        self.ConvertValues()
+
+        if top10 == True:
+            try:
+                data = self.GetTop10_DataFrame_DataOfOneYear()
+
+                if data.empty:
+                    return None
+
+                x = Data_Manipulation(data = data, years = self.allYears, country = self.country, category = self.category)
+                return x.RefineData_and_GenerateGraph(plot_kind)
+
+            except Exception:
+                return Exception # "Could not generate graph"
+
 
         try:
             df = self.GetTop5_DataFrame_DataOfAllYears()
-            print (df)
 
             if df.empty:
-                return None 
+                return None
             
-            x = Data_Manipulation(data = df, years = self.allYears,  country = self.country, category = self.category)
+            x = Data_Manipulation(data = df, years = self.allYears, country = self.country, category = self.category)
             return x.RefineData_and_GenerateGraph(plot_kind)
 
         except Exception:
