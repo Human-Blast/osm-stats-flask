@@ -69,7 +69,7 @@ class GetCount(Resource):
             category_data = db.child('/osm_data/analyzed/'+country+'/count_top_10/'+category).get()
             # insert you code here
             df = pd.DataFrame(category_data.val())
-            print(df)
+            # print(df)
             return category_data.val()
         
         return 'Inavlid data'

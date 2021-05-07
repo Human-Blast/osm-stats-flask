@@ -15,9 +15,9 @@ class Data_Manipulation:
     """A class for Data manipulation and Graph generation"""
 
     data: pd.DataFrame
-    years: list = field(default_factory = list)
     category: str
     country: str
+    years: list = field(default_factory = list)
 
     def convertImage(self, fig):
         """Converts image to Base64 string"""

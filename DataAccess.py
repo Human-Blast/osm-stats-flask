@@ -108,7 +108,7 @@ class DataAccess:
         json_data = self.GetTop10_JSON_DataofAllYearsMerged()
 
         if json_data != None:
-            return pd.DataFrame(json_data.val())
+            return pd.DataFrame(json_data)
 
         return pd.DataFrame()
 
@@ -172,7 +172,7 @@ class DataAccess:
 
                 x = Data_Manipulation(data = data, country = self.country, category = self.category)
                 return x.RefineData_and_GenerateGraph(plot_kind)
-                
+
             except Exception:
                 return Exception
 
