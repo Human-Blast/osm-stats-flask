@@ -14,7 +14,7 @@ from ImageProcess import *
 class Data_Manipulation:
     """A class for Data manipulation and Graph generation"""
 
-    data: pd.DataFrame()
+    data: pd.DataFrame
     years: list
     category: str
     country: str
