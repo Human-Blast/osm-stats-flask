@@ -38,8 +38,8 @@ class DataAccess:
     def ConvertValues(self):
         """Converts string value to lowercase"""
 
-        self.country = self.country.lower()
-        self.category = self.category.lower()
+        self.country = self.country.lower().strip()
+        self.category = self.category.lower().strip()
 
     def CheckForList(self):
         """Check for list to make it foolproof because I'm an idiot"""
@@ -98,7 +98,8 @@ class DataAccess:
         """Get top 10 JSON data from merged data"""
         
         if self.ValidateRequestAllYears():
-            return self.db.child('/osm_data/analyzed/ '+ self.country + '/count_top_10/' + self.category).get().val()
+            # self.allYears = self.db.child('/osm_data/dates/'+self.country).get().val()
+            return self.db.child('/osm_data/analyzed/'+ self.country + '/count_top_10/' + self.category).get().val()
         
         return None 
 
@@ -163,20 +164,20 @@ class DataAccess:
         if scatterTop10 == True and top10 == True:
             return None
 
-        if scatterTop10 == True and top10 == False:
+        if scatterTop10 == True and top10 == False: #for countgraph request
             try:
                 data = self.GetTop10_DataFrame_DataofAllYearsMerged()
-
+                # print(data)
                 if data.empty:
                     return None
 
-                x = Data_Manipulation(data = data, country = self.country, category = self.category)
-                return x.RefineData_and_GenerateGraph(plot_kind)
+                x = Data_Manipulation(data = data, country = self.country, category = self.category)#, years = self.allYears)
+                return x.RefineData_and_GenerateGraph(plot_kind, MergedData= True)
 
             except Exception:
                 return Exception
 
-        if top10 == True and scatterTop10 == False:
+        if top10 == True and scatterTop10 == False: #for pygraph request --bar
             try:
                 data = self.GetTop10_DataFrame_DataOfOneYear()
 

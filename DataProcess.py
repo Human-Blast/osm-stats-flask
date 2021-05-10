@@ -78,6 +78,7 @@ class Data_Manipulation:
             fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
             fig.tight_layout()
          
+            plt.close(fig)
             return self.convertImage(fig)
 
         else:
@@ -98,7 +99,7 @@ class Data_Manipulation:
             fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
             fig.tight_layout()
             
-            
+            plt.close(fig)
             return self.convertImage(fig)
             
 
@@ -140,6 +141,7 @@ class Data_Manipulation:
             plt.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50) 
             fig.tight_layout()
 
+            plt.close(fig)
             return self.convertImage(fig)
 
         else:
@@ -158,6 +160,7 @@ class Data_Manipulation:
             plt.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50) 
             fig.tight_layout()
 
+            plt.close(fig)
             return self.convertImage(fig)    
 
     def GenerateGraph_seaborn_year(self,df_ofGivenYear,year):
@@ -172,13 +175,51 @@ class Data_Manipulation:
         fig.suptitle(str(self.country).upper()+ '-' +str(self.category).upper(), fontsize=50)
         fig.tight_layout()
 
+        plt.close(fig)
         return self.convertImage(fig)
 
 
-    def RefineData_and_GenerateGraph(self, plot_kind):
+    def GenerateLineGraph(self):
+        """Generates line graph for merged data"""
+        # self.data.reset_index(inplace=True)
+        # print(self.data['20140101'].values)
+        
+        x_ = self.data.index
+        print(x_)
+        columns = self.data.columns.tolist()
+        print(columns, type(columns))
+        
+        fig, ax = plt.figure(figsize = (20, 15))
+        # print(plt.get_fignums())
+
+        for i in range(len(columns)):
+            ax.plot(self.data[columns[i]].values, marker='o', linestyle='-')#, color=c[i], label=columns[i],alpha =0.5)
+        
+        plt.close(fig)
+        return self.convertImage(fig) 
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+
+
+    def RefineData_and_GenerateGraph(self, plot_kind, MergedData = False):
         """Does the job it is told to"""
         # pprint(inspect.getmembers(Data_Manipulation, inspect.isfunction))
+        # print(self.data, self.years, type(self.years))
 
+        # if self.data.empty() : #or self.country == None or self.category == None or len(self.years) == 0:
+        #     return None
+         
+        if MergedData == True: #scatter graph with merged data
+            
+            if plot_kind == 'scatter':
+                if len(self.data.columns) > 2:
+                    self.data.set_index('name', inplace = True)
+                    # print("-------------- before return-----------------")
+                    return self.GenerateLineGraph()
+                else:
+                    pass
         try:
             if len(self.years) > 1:
                 grouped_df = self.data.groupby(self.data.index)

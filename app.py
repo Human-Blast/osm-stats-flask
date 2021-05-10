@@ -62,17 +62,28 @@ class GetData_Year(Resource):
 
 class GetCount(Resource):
     def get(self,country,category):
-        country = country.lower()
-        category = category.lower() 
-        dates = db.child('/osm_data/dates/'+country).get()
-        if(country in countries and category in category_ ):
-            category_data = db.child('/osm_data/analyzed/'+country+'/count_top_10/'+category).get()
-            # insert you code here
-            df = pd.DataFrame(category_data.val())
-            # print(df)
-            return category_data.val()
+        # country = country.lower()
+        # category = category.lower() 
+        # dates = db.child('/osm_data/dates/'+country).get()
+        # if(country in countries and category in category_ ):
+        #     category_data = db.child('/osm_data/analyzed/'+country+'/count_top_10/'+category).get()
+        #     # insert you code here
+        #     df = pd.DataFrame(category_data.val())
+        #     # print(df)
+        #     return category_data.val()
         
-        return 'Inavlid data'
+        # return 'Inavlid data'
+        try:
+            da = DataAccess(db, country = country, category = category, countriesInDB = countries, categoriesInDB = category_)
+            img = da.GenerateAndSendDataTo_DataProcess('scatter', scatterTop10=True)
+            # print("-------------ooga buga return came-----------")
+            if img == None:
+                return "Invalid Request"
+
+            return img
+
+        except Exception:
+            return Exception
 
         
 # monthly data of osm
