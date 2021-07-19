@@ -2,60 +2,24 @@ import flask
 from flask import request
 from flask_restful import Api, Resource
 from flask_cors import CORS
-import pyrebase
 import datetime
 import pandas as pd
 import json
 import os
-import matplotlib.pyplot as plt
-from DataRetrieve import *
-from ImageProcess import *
+from DataProcess import *
 from helper_functions import *
+from DataAccess import *
 
 
-firebaseConfig = {
-    "apiKey": "AIzaSyBTzzXFHncci7RanGMjNfduJ8_471RkYoU",
-    "authDomain": "open-street-map-research.firebaseapp.com",
-    "databaseURL": "https://open-street-map-research-default-rtdb.firebaseio.com",
-    "storageBucket": "open-street-map-research.appspot.com",
-    "serviceAccount": "open-street-map-research-firebase-adminsdk-4kv8q-3f47cae2b0.json"
-     }
+db = FirebaseAuthentication().run_db()
 
-firebase = pyrebase.initialize_app(firebaseConfig)
-db = firebase.database()
-store = firebase.storage()
+
 app = flask.Flask(__name__)
 CORS(app)
 api = Api(app)
-countries =['brazil','india','china','southafrica','russia']
-category_ = ['building','leisure','amenity','office','man_made','advertising','shop','craft','historic','landuse','tourism','boundary']
 
-class CountryData(Resource):
-    def get(self, name,category):
-        name = name.lower()
-        category = category.lower()
-        if(name in countries and category in category_):
-            return "Valid Country and Category. Use POST request to get the DATA"
-        return "Invalid Data.Check the docs for the API usage"
-
-    def post(self, name,category):
-
-        name = name.lower()
-        category = category.lower()
-        
-        if (name in countries):
-            if(category == 'all'):
-                country_data = db.child('/osm_data/analyzed/'+name+'/top_5/data').get()
-                # print("Country data is "+ name)
-                return country_data.val()
-            else:
-                if(category in category_):
-                    category_index = category_.index(category)
-                    category_data = db.child('/osm_data/analyzed/'+name+'/top_5/data/'+str(category_index)+'/'+category).get()
-                    # print(category_data.val())
-                    return category_data.val()  
-
-        return "Invalid Data.Check the docs for the api usage" 
+countries = db.child('/countries').get().val()
+category_ = db.child('/categories').get().val()
 
 class CSV_file(Resource):
     def get(self,country,category):
@@ -68,45 +32,66 @@ class CSV_file(Resource):
 
 class JSON_CSV(Resource):
     def get(self,country,category): 
-        country = country.lower()
-        category = category.lower() 
-        if(country in countries and category in category_):
-            category_index = category_.index(category)
-            category_data = db.child('/osm_data/analyzed/'+country+'/top_5/data/'+str(category_index)+'/'+category).get()
-            json_dict = category_data.val()
-            dates = db.child('/osm_data/dates/'+country).get()
-            # print(dates.val().len)
-            dfs_created = []
-            years = dates.val()
+        try:
+            da = DataAccess(db, country = country, category = category, countriesInDB = countries, categoriesInDB = category_)
+            img = da.GenerateAndSendDataTo_DataProcess('bar')
 
-            for date in years:
-                # for i in range(0,4):
-                # print(json_dict[str(date)])
-                df_name = country +'_'+ category
-                column_for_tag = category +'_'+ str(date)
-                globals()[df_name] = pd.DataFrame(json_dict[str(date)],index=[str(date) for i in range(5)])
-                dfs_created.append(globals()[df_name])
+            if img == None:
+                return "Invalid Request"
+
+            return img
+
+        except Exception:
+            # return "Invalid Request"
+            return Exception
+
+class GetData_Year(Resource):
+    def get(self,country,category,year):
+        try:
+            da = DataAccess(db, country = country, category = category, countriesInDB = countries, categoriesInDB = category_, allYears = year)
+            img = da.GenerateAndSendDataTo_DataProcess('bar', top10=True)
             
-            if len(dfs_created) > 0:
-                merge_df  = pd.concat(dfs_created) #.fillna(0).sort_values(df_column)
-                x = Data_Manipulation(merge_df, years, category, country)
-                fig = x.RefineData_and_GenerateGraph('bar')
-                # print(type(fig))
-                # file_name = 'test.svg'
-                # plt.savefig(file_name, dpi=100) 
-                img = ImageProcess(fig)
-                return img.ImageToBase64()
-            else:
-                return "error obtaining graph image"
+            if img == None:
+                return "Invalid Request"
 
+            return img
 
-        return "Invalid input"
+        except Exception:
+            return Exception
+    
 
+class GetCount(Resource):
+    def get(self,country,category):
+        # country = country.lower()
+        # category = category.lower() 
+        # dates = db.child('/osm_data/dates/'+country).get()
+        # if(country in countries and category in category_ ):
+        #     category_data = db.child('/osm_data/analyzed/'+country+'/count_top_10/'+category).get()
+        #     # insert you code here
+        #     df = pd.DataFrame(category_data.val())
+        #     # print(df)
+        #     return category_data.val()
+        
+        # return 'Inavlid data'
+        try:
+            da = DataAccess(db, country = country, category = category, countriesInDB = countries, categoriesInDB = category_)
+            img = da.GenerateAndSendDataTo_DataProcess('scatter', scatterTop10=True)
+            # print("-------------ooga buga return came-----------")
+            if img == None:
+                return "Invalid Request"
 
+            return img
+
+        except Exception:
+            return Exception
+
+        
 # monthly data of osm
-api.add_resource(JSON_CSV,"/api/pygraph/<string:country>/<string:category>")
-api.add_resource(CSV_file,"/api/download/<string:country>/<string:category>")
-api.add_resource(CountryData, "/api/country/<string:name>/<string:category>")
+api.add_resource(GetCount,"/osmapi/countgraph/<string:country>/<string:category>")
+api.add_resource(GetData_Year,"/osmapi/pygraph/<string:country>/<string:category>/<int:year>")
+api.add_resource(JSON_CSV,"/osmapi/pygraph/<string:country>/<string:category>")
+api.add_resource(CSV_file,"/osmapi/download/<string:country>/<string:category>")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
