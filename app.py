@@ -86,12 +86,29 @@ class GetCount(Resource):
             return Exception
 
 class DB_Data(Resource):
+    def get(self):
+        try:
+            category_data = db.child('/osm_data/all_data/analyzed/').get()
+            return category_data.val()
+        except Exception:
+            return Exception
+class DB_Data_Country(Resource):
+    def get(self,country):
+        try:
+            country = country.lower()
+            if(country in countries):
+               category_data = db.child('/osm_data/all_data/analyzed/'+country).get()
+
+            return category_data.val()
+        except Exception:
+            return Exception
+class DB_Data_Category(Resource):
     def get(self,country,category):
         try:
             country = country.lower()
             category = category.lower() 
             category_index = category_.index(category)
-            dates = db.child('/osm_data/dates/'+country).get()
+            # dates = db.child('/osm_data/dates/'+country).get()
             if(country in countries and category in category_ ):
                category_data = db.child('/osm_data/all_data/analyzed/'+country+'/data/'+str(category_index)+'/'+category).get()
 
@@ -99,13 +116,13 @@ class DB_Data(Resource):
         except Exception:
             return Exception
 
+
 class DB_Data_Year(Resource):
     def get(self,country,category,year):
         try:
             country = country.lower()
             category = category.lower() 
             category_index = category_.index(category)
-            dates = db.child('/osm_data/dates/'+country).get()
             if(country in countries and category in category_ ):
                category_data = db.child('/osm_data/all_data/analyzed/'+country+'/data/'+str(category_index)+'/'+category+'/'+str(year)).get()
 
@@ -121,7 +138,9 @@ api.add_resource(CSV_file,"/osmapi/download/<string:country>/<string:category>")
 
 
 # Raw Data From DB
-api.add_resource(DB_Data,"/osmapi/data/<string:country>/<string:category>")
+api.add_resource(DB_Data,"/osmapi/data")
+api.add_resource(DB_Data_Country,"/osmapi/data/<string:country>")
+api.add_resource(DB_Data_Category,"/osmapi/data/<string:country>/<string:category>")
 api.add_resource(DB_Data_Year,"/osmapi/data/<string:country>/<string:category>/<int:year>")
 
 if __name__ == "__main__":
